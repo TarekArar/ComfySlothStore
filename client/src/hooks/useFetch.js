@@ -2,7 +2,7 @@ import { useRef, useState, useEffect } from "react";
 
 const useFetch = (url) => {
   const cache = useRef({});
-  const [status, setStatus] = useState("idle");
+  const [status, setStatus] = useState("fetching");
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -22,7 +22,7 @@ const useFetch = (url) => {
       }
     };
 
-    fetchData();
+    setTimeout(fetchData, 1000);
   }, [url]);
 
   return { status, data };

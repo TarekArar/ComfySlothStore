@@ -1,45 +1,44 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import ProductsList from "../components/products/productsList";
 import { useFetch } from "../hooks/useFetch";
+import { Stack, Box, Input, List, ListItem, Text } from "@chakra-ui/react";
+
 import {
-  Grid,
-  GridItem,
-  CircularProgress,
-  Input,
-  List,
-  ListItem,
-  Text,
-  Flex,
-  Icon,
-} from "@chakra-ui/react";
+  Product,
+  ProductsList as ProductsListType,
+} from "../components/products/types";
+import ProgressBar from "../components/shared/progressBar";
 
-import { Product } from "../components/products/types";
-
-import { FiGrid, FiAlignJustify } from "react-icons/fi";
+interface CategorieType {
+  id: number;
+  name: string;
+}
 
 export default function Products() {
   const { status, data } = useFetch("http://localhost:3000/products");
-  const [isGrid, setIsGrid] = useState(true);
+  const { status: fetchState, data: categories } = useFetch(
+    "http://localhost:3000/categories"
+  );
+  const [filtredProducts, setFiltredProducts] = useState<ProductsListType>([]);
   const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState(0);
 
-  const filtredProducts = useMemo(() => {
-    return search
-      ? data.filter((product: Product) =>
-          product.name.toLowerCase().includes(search.toLowerCase())
-        )
-      : data;
-  }, [search]);
+  useEffect(() => {
+    let tempFiltredProducts =
+      selectedCategory === 0
+        ? data
+        : data.filter(
+            (product: Product) => product.categoryId === selectedCategory
+          );
+    tempFiltredProducts = tempFiltredProducts.filter((product: Product) =>
+      product.name.toLowerCase().includes(search.toLowerCase())
+    );
+    setFiltredProducts(tempFiltredProducts);
+  }, [search, selectedCategory, data]);
 
   return (
-    <Grid
-      h="200px"
-      templateRows="repeat(2, 1fr)"
-      templateColumns="repeat(5, 1fr)"
-      mx="20"
-      my="5"
-      gap={4}
-    >
-      <GridItem rowSpan={2} colSpan={1} mx="3">
+    <Stack mt="4" mx="20" spacing={8} direction={["column", "row"]}>
+      <Box mt="2" mx="3">
         <Input
           variant="filled"
           placeholder="search"
@@ -49,57 +48,41 @@ export default function Products() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <List spacing={1} my="2" color=" rgb(97, 125, 152)">
+        <List spacing={1} my="2" color="rgb(97, 125, 152)">
           <ListItem>
-            <Text colro="rgb(16, 42, 66)" fontWeight="bold" fontSize="large">
+            <Text color="rgb(16, 42, 66)" fontWeight="bold" fontSize="large">
               Category
             </Text>
           </ListItem>
-          <ListItem cursor="pointer">All</ListItem>
-          <ListItem cursor="pointer">Office</ListItem>
-          <ListItem cursor="pointer">Living Room</ListItem>
-          Kitchen
-          <ListItem cursor="pointer">Bedroom</ListItem>
-          <ListItem cursor="pointer">Dinning</ListItem>
-          <ListItem cursor="pointer">Kids</ListItem>
+          {categories.map((category: CategorieType, idx: any) => (
+            <ListItem
+              key={idx}
+              mr="9rem"
+              borderBottom={
+                selectedCategory === category.id
+                  ? "1px solid rgb(97, 125, 152)"
+                  : null
+              }
+              onClick={() => setSelectedCategory(category.id)}
+              cursor="pointer"
+            >
+              {category.name}
+            </ListItem>
+          ))}
         </List>
-      </GridItem>
+      </Box>
 
-      <GridItem colSpan={4}>
-        <Flex alignItems="center">
-          <Icon
-            onClick={(e: any) => setIsGrid(true)}
-            as={FiGrid}
-            w={5}
-            h={5}
-            mx="2"
-          />
-          <Icon
-            onClick={(e: any) => setIsGrid(false)}
-            as={FiAlignJustify}
-            w={5}
-            h={5}
-            mx="2"
-          />
-          <Text mx="2">{filtredProducts.length} Products Found</Text>
-        </Flex>
-      </GridItem>
-
-      <GridItem colSpan={4} bg="papayawhip">
+      <Box w="100%">
         {status === "fetching" ? (
-          <CircularProgress isIndeterminate color="green.300" />
+          <ProgressBar />
         ) : filtredProducts.length === 0 ? (
           <h4>Sorry, no products matched your search.</h4>
         ) : (
-          <ProductsList products={filtredProducts} isGrid={isGrid} />
+          <Box w="100%">
+            <ProductsList products={filtredProducts} />
+          </Box>
         )}
-      </GridItem>
-    </Grid>
-
-    //   <GridItem rowSpan={2} colSpan={1} bg="tomato" />
-    //   <GridItem colSpan={2} bg="papayawhip" />
-    //   <GridItem colSpan={2} bg="papayawhip" />
-    //   <GridItem colSpan={4} bg="tomato" />
-    // </Grid>
+      </Box>
+    </Stack>
   );
 }

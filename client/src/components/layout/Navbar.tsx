@@ -1,6 +1,6 @@
 import React from "react";
-import { Flex, Text, Box, Spacer, Center } from "@chakra-ui/react";
-import { Link } from "react-router-dom";
+import { Flex, Box, Spacer, Center } from "@chakra-ui/react";
+import NavItem from "./NavItem";
 
 export default function Navbar() {
   return (
@@ -13,42 +13,15 @@ export default function Navbar() {
       </Box>
       <Spacer />
       <Center color="grey">
-        <Text
-          mx="2"
-          cursor="pointer"
-          _hover={{
-            borderBottom: "2px solid black",
-          }}
-        >
-          <Link to="/">Home</Link>
-        </Text>
-        <Text
-          mx="2"
-          cursor="pointer"
-          _hover={{
-            borderBottom: "2px solid black",
-          }}
-        >
-          <Link to="/about">About</Link>
-        </Text>
-        <Text
-          mx="2"
-          cursor="pointer"
-          _hover={{
-            borderBottom: "2px solid black",
-          }}
-        >
-          <Link to="/products">Products</Link>
-        </Text>
+        {["Home", "About", "Products"].map((item) => (
+          <NavItem to={item} />
+        ))}
       </Center>
       <Spacer />
       <Center color="grey">
-        <Box mx="2">
-          <Text>Cart</Text>
-        </Box>
-        <Box mx="2">
-          <Text>Login</Text>
-        </Box>
+        {["Cart", "Login"].map((item) => (
+          <NavItem to={item} />
+        ))}
       </Center>
     </Flex>
   );

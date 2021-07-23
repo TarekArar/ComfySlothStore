@@ -15,7 +15,7 @@ export default function ProductCardGrid({ name, price, imageURL }: Product) {
       <Flex>
         <Text>{name}</Text>
         <Spacer />
-        <Text>{price} $</Text>
+        <Text color=" rgb(171, 122, 95)">${price}</Text>
       </Flex>
     </Box>
   );
