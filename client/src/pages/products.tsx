@@ -15,9 +15,9 @@ interface CategorieType {
 }
 
 export default function Products() {
-  const { status, data } = useFetch("http://localhost:3000/products");
+  const { status, data } = useFetch(`${process.env.API_URL}/products`);
   const { status: fetchState, data: categories } = useFetch(
-    "http://localhost:3000/categories"
+    `${process.env.API_URL}/categories`
   );
   const [filtredProducts, setFiltredProducts] = useState<ProductsListType>([]);
   const [search, setSearch] = useState("");
